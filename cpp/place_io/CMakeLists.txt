@@ -1,18 +1,24 @@
+cmake_minimum_required(VERSION 3.15)
+project(place_io LANGUAGES CXX)
+
 set(OP_NAME place_io)
 
 set(TARGET_NAME ${OP_NAME})
 
-set(INCLUDE_DIRS 
+set(LIMBO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../Limbo)
+set(UTILITY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../utility)
+
+set(INCLUDE_DIRS
   ${CMAKE_CURRENT_SOURCE_DIR}/..
-  ${LIMBO_SOURCE_DIR}
+  ${LIMBO_DIR}
+  ${UTILITY_DIR}
   ${Boost_INCLUDE_DIRS}
   ${ZLIB_INCLUDE_DIRS}
   )
 
-set(LINK_LIBS 
-  #draw_place_cxx
+set(LINK_LIBS
   utility_cxx
-  # begin targets in Limbo 
+  # begin targets in Limbo
   lefparseradapt
   defparseradapt
   verilogparser
@@ -20,8 +26,7 @@ set(LINK_LIBS
   gdsparser
   programoptions
   gzstream
-  # end targets in Limbo 
-  OpenMP::OpenMP_CXX
+  # end targets in Limbo
   ${ZLIB_LIBRARIES}
   )
 
@@ -33,28 +38,61 @@ else()
   set(DRAWPLACE 0)
 endif()
 
-add_pytorch_extension(${TARGET_NAME}_cpp 
-  src/BenchMetrics.cpp  
-  src/BinMap.cpp  
-  src/Enums.cpp  
-  src/Net.cpp  
-  src/Node.cpp  
-  src/Region.cpp  
-  src/Group.cpp  
-  src/Params.cpp  
-  src/PlaceDB.cpp  
+# Find Python and pybind11
+find_package(Python COMPONENTS Interpreter Development REQUIRED)
+
+# Get pybind11 include directory using Python
+execute_process(COMMAND ${Python_EXECUTABLE} -c
+    "import pybind11; import os; print(os.path.dirname(pybind11.__file__))"
+    OUTPUT_VARIABLE PYBIND11_DIR
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+set(PYBIND11_INCLUDE_DIR ${PYBIND11_DIR}/include)
+message(STATUS "pybind11 include dir: ${PYBIND11_INCLUDE_DIR}")
+
+# Add subdirectories for dependencies
+add_subdirectory(${UTILITY_DIR} ${CMAKE_BINARY_DIR}/utility)
+add_subdirectory(${LIMBO_DIR} ${CMAKE_BINARY_DIR}/Limbo)
+
+# Create pybind11 module manually
+add_library(${TARGET_NAME} MODULE SHARED
+  src/BenchMetrics.cpp
+  src/BinMap.cpp
+  src/Enums.cpp
+  src/Net.cpp
+  src/Node.cpp
+  src/Region.cpp
+  src/Group.cpp
+  src/Params.cpp
+  src/PlaceDB.cpp
   src/DefWriter.cpp
   src/BookshelfWriter.cpp
-  src/PyPlaceDB.cpp  
-  src/PybindPlaceDB.cpp  
-  src/PybindPyPlaceDB.cpp  
-  src/place_io.cpp  
-  EXTRA_INCLUDE_DIRS ${INCLUDE_DIRS}
-  EXTRA_LINK_LIBRARIES ${LINK_LIBS}
-  EXTRA_DEFINITIONS DRAWPLACE=${DRAWPLACE})
+  src/PyPlaceDB.cpp
+  src/PybindPlaceDB.cpp
+  src/PybindPyPlaceDB.cpp
+  src/place_io_bind.cpp
+  )
 
-install(TARGETS 
-  ${TARGET_NAME}_cpp 
-  DESTINATION dreamplace/ops/${OP_NAME})
+target_include_directories(${TARGET_NAME} PRIVATE
+  ${INCLUDE_DIRS}
+  ${PYBIND11_INCLUDE_DIR}
+  ${Python_INCLUDE_DIRS}
+  )
+
+target_link_libraries(${TARGET_NAME} PRIVATE ${LINK_LIBS} ${Python_LIBRARIES})
+target_compile_definitions(${TARGET_NAME} PRIVATE DRAWPLACE=${DRAWPLACE})
+
+# Set module properties
+set_target_properties(${TARGET_NAME} PROPERTIES
+  PREFIX ""
+  OUTPUT_NAME ${TARGET_NAME}
+  SUFFIX ${Python_SOABI}
+  )
+
+# Install
+install(TARGETS ${TARGET_NAME}
+  DESTINATION ${Python_SITEARCH})
+
 file(GLOB INSTALL_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/*.py)
-install(FILES ${INSTALL_SRCS} DESTINATION dreamplace/ops/${OP_NAME})
+install(FILES ${INSTALL_SRCS}
+  DESTINATION ${Python_SITELIB})
