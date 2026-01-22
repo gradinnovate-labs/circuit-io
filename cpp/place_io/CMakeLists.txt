@@ -1,6 +1,14 @@
 cmake_minimum_required(VERSION 3.15)
 project(place_io LANGUAGES CXX)
 
+# Match Limbo's CXX ABI setting to avoid symbol mismatch
+if(NOT CMAKE_CXX_ABI)
+    set(CMAKE_CXX_ABI 0 CACHE STRING
+        "Choose the value for _GLIBCXX_USE_CXX11_ABI, options are: 0|1."
+        FORCE)
+endif()
+add_definitions(-D_GLIBCXX_USE_CXX11_ABI=${CMAKE_CXX_ABI})
+
 set(OP_NAME place_io)
 
 set(TARGET_NAME ${OP_NAME})
@@ -50,6 +58,14 @@ execute_process(COMMAND ${Python_EXECUTABLE} -c
 set(PYBIND11_INCLUDE_DIR ${PYBIND11_DIR}/include)
 message(STATUS "pybind11 include dir: ${PYBIND11_INCLUDE_DIR}")
 
+# Get Python extension suffix for proper module naming
+execute_process(COMMAND ${Python_EXECUTABLE} -c
+    "import sysconfig; print(sysconfig.get_config_var('EXT_SUFFIX'))"
+    OUTPUT_VARIABLE Python_EXT_SUFFIX
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+message(STATUS "Python extension suffix: ${Python_EXT_SUFFIX}")
+
 # Add subdirectories for dependencies
 add_subdirectory(${UTILITY_DIR} ${CMAKE_BINARY_DIR}/utility)
 add_subdirectory(${LIMBO_DIR} ${CMAKE_BINARY_DIR}/Limbo)
@@ -70,7 +86,7 @@ add_library(${TARGET_NAME} MODULE SHARED
   src/PyPlaceDB.cpp
   src/PybindPlaceDB.cpp
   src/PybindPyPlaceDB.cpp
-  src/place_io_bind.cpp
+  src/place_io.cpp
   )
 
 target_include_directories(${TARGET_NAME} PRIVATE
@@ -86,7 +102,7 @@ target_compile_definitions(${TARGET_NAME} PRIVATE DRAWPLACE=${DRAWPLACE})
 set_target_properties(${TARGET_NAME} PROPERTIES
   PREFIX ""
   OUTPUT_NAME ${TARGET_NAME}
-  SUFFIX ${Python_SOABI}
+  SUFFIX "${Python_EXT_SUFFIX}"
   )
 
 # Install

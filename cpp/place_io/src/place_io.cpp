@@ -162,7 +162,7 @@ DREAMPLACE_END_NAMESPACE
 void bind_PlaceDB(pybind11::module&);
 void bind_PyPlaceDB(pybind11::module&);
 
-PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
+PYBIND11_MODULE(place_io, m) {
 
     bind_PlaceDB(m); 
     bind_PyPlaceDB(m);
