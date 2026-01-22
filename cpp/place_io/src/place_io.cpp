@@ -155,9 +155,87 @@ PlaceDB place_io_forward(pybind11::list const& args)
     return db; 
 }
 
+PlaceDB read_bookshelf(const std::string& aux_file)
+{
+    DREAMPLACE_NAMESPACE::PlaceDB db;
+    db.userParam().bookshelfAuxInput = aux_file;
+    bool flag = DREAMPLACE_NAMESPACE::readBookshelf(db);
+    dreamplaceAssertMsg(flag, "failed to read Bookshelf file");
+    db.adjustParams();
+    return db;
+}
+
+PlaceDB read_lef_def(pybind11::list lef_files, const std::string& def_file)
+{
+    DREAMPLACE_NAMESPACE::PlaceDB db;
+
+    std::vector<std::string> vLef;
+    int n = pybind11::len(lef_files);
+    for (int i = 0; i < n; ++i)
+    {
+        vLef.push_back(pybind11::str(lef_files[i]));
+    }
+
+    db.userParam().vLefInput = vLef;
+    db.userParam().defInput = def_file;
+
+    bool flag = DREAMPLACE_NAMESPACE::readLef(db);
+    dreamplaceAssertMsg(flag, "failed to read input LEF files");
+
+    flag = DREAMPLACE_NAMESPACE::readDef(db);
+    dreamplaceAssertMsg(flag, "failed to read input DEF files");
+
+    if (db.nets().empty())
+    {
+        flag = DREAMPLACE_NAMESPACE::readVerilog(db);
+        dreamplaceAssertMsg(flag, "failed to read input Verilog files");
+    }
+
+    db.adjustParams();
+    return db;
+}
+
+PlaceDB read_verilog(const std::string& verilog_file)
+{
+    DREAMPLACE_NAMESPACE::PlaceDB db;
+    db.userParam().verilogInput = verilog_file;
+    bool flag = DREAMPLACE_NAMESPACE::readVerilog(db);
+    dreamplaceAssertMsg(flag, "failed to read input Verilog file");
+    db.adjustParams();
+    return db;
+}
+
+PlaceDB read_mixed(pybind11::list lef_files, const std::string& def_file, const std::string& verilog_file)
+{
+    DREAMPLACE_NAMESPACE::PlaceDB db;
+
+    std::vector<std::string> vLef;
+    int n = pybind11::len(lef_files);
+    for (int i = 0; i < n; ++i)
+    {
+        vLef.push_back(pybind11::str(lef_files[i]));
+    }
+
+    db.userParam().vLefInput = vLef;
+    db.userParam().defInput = def_file;
+    db.userParam().verilogInput = verilog_file;
+
+    bool flag = DREAMPLACE_NAMESPACE::readLef(db);
+    dreamplaceAssertMsg(flag, "failed to read input LEF files");
+
+    flag = DREAMPLACE_NAMESPACE::readDef(db);
+    dreamplaceAssertMsg(flag, "failed to read input DEF files");
+
+    flag = DREAMPLACE_NAMESPACE::readVerilog(db);
+    dreamplaceAssertMsg(flag, "failed to read input Verilog file");
+
+    db.adjustParams();
+    return db;
+}
+
 DREAMPLACE_END_NAMESPACE
 
-// create Python binding 
+// create Python binding
 
 void bind_PlaceDB(pybind11::module&);
 void bind_PyPlaceDB(pybind11::module&);
@@ -186,6 +264,11 @@ PYBIND11_MODULE(place_io, m) {
                 pybind11::array_t<double, pybind11::array::c_style | pybind11::array::forcecast> const& y) {apply(db, x, y);},
              "Apply Placement Solution (double)");
     m.def("pydb", [](DREAMPLACE_NAMESPACE::PlaceDB const& db){return DREAMPLACE_NAMESPACE::PyPlaceDB(db);}, "Convert PlaceDB to PyPlaceDB");
-    m.def("forward", &DREAMPLACE_NAMESPACE::place_io_forward, "PlaceDB IO Read");
+
+    m.def("read_bookshelf", &DREAMPLACE_NAMESPACE::read_bookshelf, "Read Bookshelf format (one argument: aux file path)");
+    m.def("read_lef_def", &DREAMPLACE_NAMESPACE::read_lef_def, "Read LEF + DEF format (two arguments: lef file list, def file path)");
+    m.def("read_verilog", &DREAMPLACE_NAMESPACE::read_verilog, "Read Verilog format (one argument: verilog file path)");
+    m.def("read_mixed", &DREAMPLACE_NAMESPACE::read_mixed, "Read LEF + DEF + Verilog format (three arguments: lef file list, def file path, verilog file path)");
+    m.def("forward", &DREAMPLACE_NAMESPACE::place_io_forward, "Legacy: read via command line args");
 }
 
