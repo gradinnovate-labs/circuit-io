@@ -21,58 +21,56 @@ on:
           - prod
 
 jobs:
-  build_wheels:
-    name: Build wheels on ${{ matrix.os }} (Python ${{ matrix.python }} ABI${{ matrix.abi }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest]
-        python: ["3.8", "3.9", "3.10", "3.11", "3.12"]
-        abi: ["0", "1"]
-        exclude:
-          # Python < 3.10 only supports ABI=0
-          - python: "3.8"
-            abi: "1"
-          - python: "3.9"
-            abi: "1"
-          # Exclude invalid combinations
-          - python: "3.11"
-            os: macos-latest  # Only test macos with 3.10+
-            abi: "0"
-
+  build_wheels_abi0:
+    name: Build wheels ABI=0 (NumPy < 2.0)
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           submodules: recursive
 
-      - name: Set up Python ${{ matrix.python }}
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python }}
-
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libboost-dev libboost-regex-dev libboost-graph-dev zlib1g zlib1g-dev libfl-dev
-
-      - name: Install build dependencies
-        run: |
-          pip install scikit-build-core pybind11 ninja build wheel setuptools numpy
-          sudo apt-get install -y patchelf
-
-      - name: Build wheel (Python ${{ matrix.python }} ABI${{ matrix.abi }})
+      - name: Build wheels with cibuildwheel
+        uses: pypa/cibuildwheel@v2.21.3
         env:
-          CMAKE_CXX_ABI: ${{ matrix.abi }}
-        run: |
-          python -m build --wheel --outdir dist/ --no-isolation
+          CIBW_BUILD: cp38-* cp39-* cp310-* cp311-* cp312-*
+          CIBW_SKIP: "*-musllinux_* *-win32 *-win_arm64 *-macosx_arm64"
+          CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
+          CIBW_ARCHS: x86_64
+          CIBW_ENVIRONMENT: |
+            CMAKE_CXX_ABI=0
+            CMAKE_BUILD_TYPE=Release
 
-     
-
-      - name: Upload wheel
+      - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheel-py${{ matrix.python }}-abi${{ matrix.abi }}-${{ runner.os }}
-          path: dist/*.whl
+          name: wheel-abi0
+          path: wheelhouse/*.whl
+          retention-days: 7
+
+  build_wheels_abi1:
+    name: Build wheels ABI=1 (NumPy >= 2.0)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Build wheels with cibuildwheel
+        uses: pypa/cibuildwheel@v2.21.3
+        env:
+          CIBW_BUILD: cp310-* cp311-* cp312-*
+          CIBW_SKIP: "*-musllinux_* *-win32 *-win_arm64 *-macosx_arm64"
+          CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
+          CIBW_ARCHS: x86_64
+          CIBW_ENVIRONMENT: |
+            CMAKE_CXX_ABI=1
+            CMAKE_BUILD_TYPE=Release
+
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheel-abi1
+          path: wheelhouse/*.whl
           retention-days: 7

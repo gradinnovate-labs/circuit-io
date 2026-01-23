@@ -32,9 +32,8 @@ jobs:
       - name: Download all wheels
         uses: actions/download-artifact@v4
         with:
-          pattern: wheel-*
           path: ./wheels
-          merge-multiple: false
+          merge-multiple: true
 
       - name: List downloaded files
         run: |
