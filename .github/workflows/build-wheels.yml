@@ -59,7 +59,8 @@ jobs:
 
       - name: Install build dependencies
         run: |
-          pip install scikit-build-core pybind11 ninja build wheel auditwheel
+          pip install scikit-build-core pybind11 ninja build
+          sudo apt-get install -y patchelf
 
       - name: Build wheel (Python ${{ matrix.python }} ABI${{ matrix.abi }})
         env:
@@ -67,15 +68,19 @@ jobs:
         run: |
           python -m build --wheel --outdir dist/
 
-      - name: Repair wheel with auditwheel
+      - name: Repair wheel RPATH
         run: |
-          auditwheel repair dist/*.whl -w dist/ --plat manylinux2014_x86_64
+          python -m wheel unpack dist/*.whl -d /tmp/unpack
+          WHEEL_DIR=$(ls -d /tmp/unpack/*/place_io)
+          # Remove existing RPATH and set library search paths
+          patchelf --remove-rpath ${WHEEL_DIR}/place_io.cpython*-linux-gnu.so
+          patchelf --force-rpath --set-rpath '$ORIGIN' ${WHEEL_DIR}/place_io.cpython*-linux-gnu.so
+          python -m wheel pack /tmp/unpack/*/ -w dist/
 
       - name: Check built wheel
         run: |
           ls -lh dist/
-          # Install the repaired wheel (after auditwheel, there will be two wheels - original and repaired)
-          pip install dist/*manylinux*.whl || pip install dist/*.whl
+          pip install dist/*.whl
           python -c "import place_io; print('Module loaded successfully')"
 
       - name: Upload wheel
