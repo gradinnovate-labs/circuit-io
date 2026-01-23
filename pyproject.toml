@@ -4,7 +4,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "place_io"
-dynamic = ["version"]
+version = "0.1.0"
 requires-python = ">=3.8"
 readme = "README.md"
 license = {text = "MIT"}
@@ -24,77 +24,14 @@ classifiers = [
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: Python :: 3.11",
+    "Programming Language :: Python :: Python :: 3.12",
     "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
 ]
 
 [tool.scikit-build]
-cmake.minimum-version = "3.15"
+cmake.version = ">=3.15"
+cmake.source-dir = "cpp/place_io"
 cmake.args = ["-DCMAKE_BUILD_TYPE=Release", "-DINSTALL_LIMBO=OFF"]
+cmake.define = {SKBUILD_PROJECT_VERSION = "$PROJECT_VERSION"}
 wheel.py-api = "cp39"
-
-[tool.scikit-build.cmake.define]
-SKBUILD_PROJECT_VERSION = "$PROJECT_VERSION"
-
-[tool.scikit-build.metadata]
-version = "versioneer:get_version()"
-requires-python = ">=3.8"
-
-# Build separate packages for different Python versions with ABIs
-[[tool.scikit-build.wheel-tag]]
-python = "cp38-*"
-abi = "manylinux2014_x86_64"
-tag = "cp38-manylinux"
-
-[[tool.scikit-build.wheel-tag]]
-python = "cp39-*"
-abi = "manylinux2014_x86_64"
-tag = "cp39-manylinux"
-
-[[tool.scikit-build.wheel-tag]]
-python = "cp310-*"
-abi = "manylinux2014_x86_64"
-tag = "cp310-manylinux"
-
-[[tool.scikit-build.wheel-tag]]
-python = "cp311-*"
-abi = "manylinux2014_x86_64"
-tag = "cp311-manylinux"
-
-[[tool.scikit-build.wheel-tag]]
-python = "cp312-*"
-abi = "manylinux2014_x86_64"
-tag = "cp312-manylinux"
-
-[[tool.scikit-build.wheel-tag]]
-python = "cp38-*"
-abi = "manylinux2_17_x86_64"
-tag = "cp38-macos"
-
-[[tool.scikit-build.wheel-tag]]
-python = "cp39-*"
-abi = "manylinux2_17_x86_64"
-tag = "cp39-macos"
-
-[[tool.scikit-build.wheel-tag]]
-python = "cp310-*"
-abi = "manylinux2_17_x86_64"
-tag = "cp310-macos"
-
-[[tool.scikit-build.wheel-tag]]
-python = "cp311-*"
-abi = "manylinux2_17_x86_64"
-tag = "cp311-macos"
-
-[[tool.scikit-build.wheel-tag]]
-python = "cp312-*"
-abi = "manylinux2_17_x86_64"
-tag = "cp312-macos"
-
-[tool.versioneer]
-VCS = "git"
-style = "pep440"
-versionfile_source = "cpp/place_io"
-versionfile_build = "cpp/place_io"
-versionfile = "PLACE_IO_VERSION"

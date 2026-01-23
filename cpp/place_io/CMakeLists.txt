@@ -106,10 +106,10 @@ set_target_properties(${TARGET_NAME} PROPERTIES
   SUFFIX "${Python_EXT_SUFFIX}"
   )
 
-# Install
+# Install - using scikit-build-core's Python integration
 install(TARGETS ${TARGET_NAME}
-  DESTINATION ${Python_SITEARCH})
+  LIBRARY DESTINATION place_io)
 
 file(GLOB INSTALL_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/*.py)
 install(FILES ${INSTALL_SRCS}
-  DESTINATION ${Python_SITELIB})
+  DESTINATION place_io)
