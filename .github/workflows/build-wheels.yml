@@ -1,0 +1,67 @@
+name: Build wheels
+
+on:
+  push:
+    tags:
+      - "v*"
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }} (Python ${{ matrix.python }} ABI${{ matrix.abi }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        abi: ["0", "1"]
+        exclude:
+          # Python < 3.10 only supports ABI=0
+          - python: "3.8"
+            abi: "1"
+          - python: "3.9"
+            abi: "1"
+          # Exclude invalid combinations
+          - python: "3.11"
+            os: macos-latest  # Only test macos with 3.10+
+            abi: "0"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install build dependencies
+        run: |
+          pip install scikit-build-core pybind11 ninja
+
+      - name: Build wheel (Python ${{ matrix.python }} ABI${{ matrix.abi }})
+        working-directory: ./cpp/place_io
+        env:
+          CMAKE_CXX_ABI: ${{ matrix.abi }}
+        run: |
+          pip install .
+
+      - name: Check built wheel
+        working-directory: ./cpp/place_io
+        run: |
+          ls -lh dist/
+          python -m wheel unpack dist/*.whl --dest-dir /tmp/unpack
+          python -c "import sys; sys.path.insert(0, '/tmp/unpack/place_io'); import place_io; print('Module loaded successfully')"
+
+      - name: Upload wheel
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheel-py${{ matrix.python }}-abi${{ matrix.abi }}-${{ runner.os }}
+          path: cpp/place_io/dist/*.whl
+          retention-days: 7

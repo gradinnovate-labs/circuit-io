@@ -1,10 +1,11 @@
 cmake_minimum_required(VERSION 3.15)
 project(place_io LANGUAGES CXX)
 
-# Match Limbo's CXX ABI setting to avoid symbol mismatch
-if(NOT CMAKE_CXX_ABI)
+# Support both old ABI (0) and new ABI (1) for compatibility
+# Default to old ABI for backward compatibility, but allow override
+if(NOT DEFINED CMAKE_CXX_ABI)
     set(CMAKE_CXX_ABI 0 CACHE STRING
-        "Choose the value for _GLIBCXX_USE_CXX11_ABI, options are: 0|1."
+        "Choose the value for _GLIBCXX_USE_CXX11_ABI, options are: 0 (old) | 1 (new)."
         FORCE)
 endif()
 add_definitions(-D_GLIBCXX_USE_CXX11_ABI=${CMAKE_CXX_ABI})
