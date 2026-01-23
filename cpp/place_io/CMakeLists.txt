@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.15)
 project(place_io LANGUAGES CXX)
 
+# Find required dependencies
+find_package(ZLIB REQUIRED)
+
 # Support both old ABI (0) and new ABI (1) for compatibility
 # Default to old ABI for backward compatibility, but allow override
 if(NOT DEFINED CMAKE_CXX_ABI)
@@ -26,6 +29,7 @@ set(INCLUDE_DIRS
   )
 
 set(LINK_LIBS
+  ${ZLIB_LIBRARIES}
   utility_cxx
   # begin targets in Limbo
   lefparseradapt
@@ -36,8 +40,7 @@ set(LINK_LIBS
   programoptions
   gzstream
   # end targets in Limbo
-  ${ZLIB_LIBRARIES}
-  )
+)
 
 if(CAIRO_FOUND)
   set(INCLUDE_DIRS ${INCLUDE_DIRS} ${CAIRO_INCLUDE_DIRS})
