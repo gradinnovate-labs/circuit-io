@@ -52,6 +52,11 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
 
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libboost-dev libboost-regex-dev libboost-graph-dev zlib1g-dev
+
       - name: Install build dependencies
         run: |
           pip install scikit-build-core pybind11 ninja build
