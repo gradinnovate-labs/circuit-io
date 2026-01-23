@@ -51,7 +51,7 @@ else()
 endif()
 
 # Find Python and pybind11
-find_package(Python COMPONENTS Interpreter Development REQUIRED)
+find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
 
 # Get pybind11 include directory using Python
 execute_process(COMMAND ${Python_EXECUTABLE} -c
