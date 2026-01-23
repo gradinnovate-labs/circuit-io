@@ -59,7 +59,7 @@ jobs:
 
       - name: Install build dependencies
         run: |
-          pip install scikit-build-core pybind11 ninja build wheel
+          pip install scikit-build-core pybind11 ninja build wheel auditwheel
 
       - name: Build wheel (Python ${{ matrix.python }} ABI${{ matrix.abi }})
         env:
@@ -67,10 +67,15 @@ jobs:
         run: |
           python -m build --wheel --outdir dist/
 
+      - name: Repair wheel with auditwheel
+        run: |
+          auditwheel repair dist/*.whl -w dist/ --plat manylinux2014_x86_64
+
       - name: Check built wheel
         run: |
           ls -lh dist/
-          pip install dist/*.whl
+          # Install the repaired wheel (after auditwheel, there will be two wheels - original and repaired)
+          pip install dist/*manylinux*.whl || pip install dist/*.whl
           python -c "import place_io; print('Module loaded successfully')"
 
       - name: Upload wheel
