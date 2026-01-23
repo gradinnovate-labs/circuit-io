@@ -102,6 +102,12 @@ target_include_directories(${TARGET_NAME} PRIVATE
 target_link_libraries(${TARGET_NAME} PRIVATE ${LINK_LIBS} ${Python_LIBRARIES})
 target_compile_definitions(${TARGET_NAME} PRIVATE DRAWPLACE=${DRAWPLACE})
 
+# Set RPATH to find zlib at runtime
+set_target_properties(${TARGET_NAME} PROPERTIES
+  INSTALL_RPATH "$ORIGIN;$ORIGIN/../.."
+  BUILD_WITH_INSTALL_RPATH TRUE
+)
+
 # Set module properties
 set_target_properties(${TARGET_NAME} PROPERTIES
   PREFIX ""
