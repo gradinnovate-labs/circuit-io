@@ -153,3 +153,33 @@ MIT License
 This library uses parts of the source code from [DREAMPlace](https://github.com/limbo018/DREAMPlace).
 
 
+
+## PyPI Deployment
+
+### Upload Script
+
+Use the `upload_pypi.sh` script to deploy:
+
+```bash
+# Upload to PyPI Test
+export PYPI_TEST_TOKEN="pypi-xxx"
+./upload_pypi.sh --test
+
+# Upload to PyPI Production
+export PYPI_PUB_TOKEN="pypi-xxx"
+./upload_pypi.sh --prod
+```
+
+### Verify Test Deployment
+
+After uploading to test.pypi.org, verify installation:
+
+```bash
+pip install --index-url https://test.pypi.org/simple/ circuit_io
+
+# Or with extra-index-url for dependencies from PyPI
+pip install --extra-index-url https://test.pypi.org/simple/ circuit_io
+
+# Test installation
+python -c "import circuit_io; print(circuit_io.__version__)"
+```
