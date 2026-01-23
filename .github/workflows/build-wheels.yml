@@ -70,7 +70,7 @@ jobs:
       - name: Check built wheel
         run: |
           ls -lh dist/
-          python -m wheel unpack dist/*.whl --dest-dir /tmp/unpack
+          python -m wheel unpack dist/*.whl -d /tmp/unpack
           python -c "import sys; sys.path.insert(0, '/tmp/unpack/place_io'); import place_io; print('Module loaded successfully')"
 
       - name: Upload wheel
