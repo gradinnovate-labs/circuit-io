@@ -54,28 +54,15 @@ jobs:
 
       - name: Install build dependencies
         run: |
-          pip install scikit-build-core pybind11 ninja
+          pip install scikit-build-core pybind11 ninja build
 
       - name: Build wheel (Python ${{ matrix.python }} ABI${{ matrix.abi }})
         env:
           CMAKE_CXX_ABI: ${{ matrix.abi }}
-          DEPLOY_MODE: ${{ github.event.inputs.deploy_mode }}
-          PYPI_PUB_TOKEN: ${{ secrets.PYPI_PUB_TOKEN }}
-          PYPI_TEST_TOKEN: ${{ secrets.PYPI_TEST_TOKEN }}
         run: |
-          if [ "${DEPLOY_MODE}" = "prod" ]; then
-            echo "Deploying to Production PyPI"
-            TWINE_USERNAME="__token__"
-            TWINE_PASSWORD="${PYPI_PUB_TOKEN}"
-          else
-            echo "Deploying to TestPyPI"
-            TWINE_USERNAME="__token__"
-            TWINE_PASSWORD="${PYPI_TEST_TOKEN}"
-          fi
-          python -m pip install .
+          python -m build --wheel --outdir dist/
 
       - name: Check built wheel
-        working-directory: ./cpp/place_io
         run: |
           ls -lh dist/
           python -m wheel unpack dist/*.whl --dest-dir /tmp/unpack
@@ -85,5 +72,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: wheel-py${{ matrix.python }}-abi${{ matrix.abi }}-${{ runner.os }}
-          path: cpp/place_io/dist/*.whl
+          path: dist/*.whl
           retention-days: 7

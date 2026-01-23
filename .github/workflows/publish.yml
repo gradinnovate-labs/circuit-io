@@ -20,8 +20,6 @@ jobs:
 
       - name: Download all wheels
         uses: actions/download-artifact@v4
-        with:
-          path: cpp/place_io/dist/*.whl
 
       - name: Publish to Production PyPI
         env:
@@ -29,7 +27,7 @@ jobs:
           TWINE_PASSWORD: ${{ secrets.PYPI_PUB_TOKEN }}
         run: |
           pip install twine
-          twine upload cpp/place_io/dist/*.whl --skip-existing
+          find . -name "*.whl" -exec twine upload {} + --skip-existing
 
   publish_test:
     name: Publish to TestPyPI
@@ -43,8 +41,6 @@ jobs:
 
       - name: Download all wheels
         uses: actions/download-artifact@v4
-        with:
-          path: cpp/place_io/dist/*.whl
 
       - name: Publish to TestPyPI
         env:
@@ -52,4 +48,4 @@ jobs:
           TWINE_PASSWORD: ${{ secrets.PYPI_TEST_TOKEN }}
         run: |
           pip install twine
-          twine upload --repository-url https://test.pypi.org/legacy/ cpp/place_io/dist/*.whl --skip-existing
+          find . -name "*.whl" -exec twine upload --repository-url https://test.pypi.org/legacy/ {} + --skip-existing
