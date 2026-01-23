@@ -46,7 +46,7 @@ jobs:
           pip install scikit-build-core pybind11 ninja
 
       - name: Build wheel (Python ${{ matrix.python }} ABI${{ matrix.abi }})
-        working-directory: ./cpp/place_io
+        working-directory: ./
         env:
           CMAKE_CXX_ABI: ${{ matrix.abi }}
         run: |
