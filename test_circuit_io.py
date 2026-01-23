@@ -1,16 +1,15 @@
 #!/usr/bin/env python3
 """
-Test script for place_io module.
+Test script for circuit_io module.
 Reads a Bookshelf benchmark and prints circuit properties.
 """
 
 import sys
 import os
 
-# Add the build directory to Python path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'cpp', 'place_io', 'build'))
 
-import place_io
+
+import circuit_io
 
 def main():
     # Path to adaptec1 benchmark
@@ -22,7 +21,7 @@ def main():
     # Use forward function to read the Bookshelf files
     # forward expects a list of command-line arguments
     args = ['DREAMPlace', '--bookshelf_aux_input', aux_file]
-    db = place_io.forward(args)
+    db = circuit_io.forward(args)
 
     # Output 1: Basic circuit properties
     print("\n1. BASIC CIRCUIT PROPERTIES")
@@ -58,8 +57,8 @@ def main():
     for i in range(min(10, len(db.nodes()))):
         node = db.node(i)
         node_name = db.nodeProperty(node).name()
-        status_str = "FIXED" if node.status() == place_io.PlaceStatusEnum.FIXED else \
-                   "PLACED" if node.status() == place_io.PlaceStatusEnum.PLACED else \
+        status_str = "FIXED" if node.status() == circuit_io.PlaceStatusEnum.FIXED else \
+                   "PLACED" if node.status() == circuit_io.PlaceStatusEnum.PLACED else \
                    "UNPLACED"
         orient_str = str(node.orient()) if node.orient() else "N"
 
@@ -68,7 +67,7 @@ def main():
     print("=" * 60)
 
     # Convert to PyPlaceDB for more Python-friendly data access
-    pydb = place_io.pydb(db)
+    pydb = circuit_io.pydb(db)
 
     print(f"\nPyPlaceDB num_nodes: {pydb.num_nodes}")
     print(f"PyPlaceDB num_terminals: {pydb.num_terminals}")

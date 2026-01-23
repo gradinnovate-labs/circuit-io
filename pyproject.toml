@@ -3,17 +3,16 @@ requires = ["scikit-build-core", "pybind11"]
 build-backend = "scikit_build_core.build"
 
 [project]
-name = "place_io"
-version = "0.1.0"
+name = "circuit_io"
+version = "0.4.0"
 requires-python = ">=3.8"
 readme = "README.md"
 license = {text = "MIT"}
 description = "Circuit placement I/O library with multi-format support (Bookshelf, LEF/DEF, Verilog)"
 authors = [
-    {name = "Yibo Lin", email = "yibolin@utexas.edu"},
-    {name = "circuit-io contributors", email = "contact@gradinnovate.com"}
+    {name = "Magi Chen", email = "magi@gradinnovate.com"}
 ]
-keywords = ["vlsi", "placement", "ic-design", "bookshelf", "lef", "def", "verilog", "ispd"]
+keywords = ["vlsi", "ic-design", "bookshelf", "lef", "def", "verilog", "ispd"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",

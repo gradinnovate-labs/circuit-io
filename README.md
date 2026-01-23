@@ -1,6 +1,6 @@
-# place_io
+# circuit_io
 
-Circuit placement I/O library with multi-format support (Bookshelf, LEF/DEF, Verilog).
+Circuit I/O library with multi-format support (Bookshelf, LEF/DEF, Verilog).
 
 ## Features
 
@@ -17,48 +17,45 @@ Circuit placement I/O library with multi-format support (Bookshelf, LEF/DEF, Ver
 
 ```bash
 # Install from PyPI
-pip install place_io
+pip install circuit_io
 
 # Note: By default installs ABI=0 (old C++ ABI) for maximum compatibility
-# For new ABI, install: place_io_cxx11
+# For new ABI, install: circuit_io_cxx11
 ```
 
 ### From Source
 
 ```bash
 git clone https://github.com/gradinnovate-labs/circuit-io.git
-cd circuit-io/cpp/place_io
+cd circuit-io
 
-# Build with default ABI (old, compatible with older NumPy)
-mkdir build && cd build
-cmake -S .. -B . -DCMAKE_BUILD_TYPE=Release
-cmake --build . --target place_io
-pip install .
+# Option 1: Recommended - use uv (faster)
+uv pip install .
 
-# Build with new ABI (required for newer NumPy versions)
-cmake -S .. -B . -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_ABI=1
-cmake --build . --target place_io
+# Option 2: Use pip
 pip install .
 ```
+
+**Note**: The build process is handled automatically by `scikit-build-core`. You don't need to run CMake manually.
 
 ## Usage
 
 ### New API (Recommended)
 
 ```python
-import place_io
+import circuit_io
 
 # 1. Read Bookshelf format (ISPD benchmarks)
-db = place_io.read_bookshelf('path/to/design.aux')
+db = circuit_io.read_bookshelf('path/to/design.aux')
 
 # 2. Read LEF + DEF format (Industrial designs)
-db = place_io.read_lef_def(['tech.lef', 'cells.lef'], 'design.def')
+db = circuit_io.read_lef_def(['tech.lef', 'cells.lef'], 'design.def')
 
 # 3. Read Verilog format (Netlist analysis)
-db = place_io.read_verilog('path/to/design.v')
+db = circuit_io.read_verilog('path/to/design.v')
 
 # 4. Read mixed format (LEF + DEF + Verilog for complex designs)
-db = place_io.read_mixed(
+db = circuit_io.read_mixed(
     ['tech.lef', 'cells.lef'],  # LEF files
     'floorplan.def',                # DEF file
     'design.v'                     # Verilog file
@@ -74,11 +71,11 @@ print(f"Die area: ({db.xl()}, {db.yl()}) to ({db.xh()}, {db.yh()})")
 ### Legacy API (Backward Compatible)
 
 ```python
-import place_io
+import circuit_io
 
 # Old command-line style (still works for compatibility)
 args = ['DREAMPlace', '--bookshelf_aux_input', 'adaptec1.aux']
-db = place_io.forward(args)
+db = circuit_io.forward(args)
 ```
 
 ## API Comparison
@@ -104,18 +101,21 @@ db = place_io.forward(args)
 ### ABI Notes
 
 - **ABI=0 (default)**: Compatible with older NumPy (<2.0), C++11 ABI=0
-- **ABI=1** (`place_io_cxx11` package): Required for newer NumPy (>=2.0), C++11 ABI=1
+- **ABI=1** (`circuit_io_cxx11` package): Required for newer NumPy (>=2.0), C++11 ABI=1
 
 ## Development
 
 ### Building Wheels Locally
 
 ```bash
-# Install build tools
-pip install scikit-build-core pybind11 cibuildwheel
+# Option 1: Recommended - use uv
+uv pip install .
 
-# Build all Python versions and ABIs
-cd cpp/place_io
+# Option 2: Use pip
+pip install .
+
+# Option 3: For GitHub Actions CI
+pip install scikit-build-core pybind11 cibuildwheel
 python -m pip wheel . --no-build-isolation -w wheelhouse
 ```
 
@@ -123,7 +123,7 @@ python -m pip wheel . --no-build-isolation -w wheelhouse
 
 ```bash
 # Run test script (requires built module)
-python3 test_new_api.py
+python3 test_circuit_io.py
 ```
 
 ## Benchmark Support
@@ -148,14 +148,8 @@ MIT License
 4. Run tests
 5. Submit a pull request
 
-## Citation
+## Acknowledgment
 
-If you use this library in your research, please cite the original DREAMPlace project:
-```
-@inproceedings{lin2020dreamplace,
-  title={DREAMPlace: Deep Learning Toolbox-Enabled VLSI Placement},
-  author={Lin, Yibo and others},
-  booktitle={Proceedings of the 57th ACM/EDAC/IEEE Design Automation Conference (DAC)},
-  year={2020}
-}
-```
+This library uses parts of the source code from [DREAMPlace](https://github.com/limbo018/DREAMPlace).
+
+

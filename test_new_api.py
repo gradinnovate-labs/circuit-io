@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 """
-Test script for place_io module - testing all three benchmark formats
+Test script for circuit_io module - testing all three benchmark formats
 """
 
 import sys
 import os
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'cpp', 'place_io', 'build'))
 
-import place_io
+import circuit_io
 
 def test_bookshelf():
     """Test 1: adaptec1 (Bookshelf format)"""
@@ -21,7 +20,7 @@ def test_bookshelf():
 
     print(f"Reading: {abs_path}")
 
-    db = place_io.read_bookshelf(abs_path)
+    db = circuit_io.read_bookshelf(abs_path)
 
     print(f"Design name: {db.designName()}")
     print(f"Number of nets: {len(db.nets())}")
@@ -67,7 +66,7 @@ def test_lef_def_verilog():
 
     # Use read_mixed approach
     print("\nUsing read_mixed (LEF + DEF + Verilog)...")
-    db = place_io.read_mixed([abs_lef1, abs_lef2], abs_def, abs_verilog)
+    db = circuit_io.read_mixed([abs_lef1, abs_lef2], abs_def, abs_verilog)
 
     print(f"Design name: {db.designName()}")
     print(f"Number of nets: {len(db.nets())}")
@@ -95,7 +94,7 @@ def test_lef_def():
 
     # Use read_lef_def
     print("\nUsing read_lef_def (LEF + DEF)...")
-    db = place_io.read_lef_def([abs_lef], abs_def)
+    db = circuit_io.read_lef_def([abs_lef], abs_def)
 
     print(f"Design name: {db.designName()}")
     print(f"Number of nets: {len(db.nets())}")

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(place_io LANGUAGES CXX)
+project(circuit_io LANGUAGES CXX)
 
 # Find required dependencies
 find_package(ZLIB REQUIRED)
@@ -13,7 +13,7 @@ if(NOT DEFINED CMAKE_CXX_ABI)
 endif()
 add_definitions(-D_GLIBCXX_USE_CXX11_ABI=${CMAKE_CXX_ABI})
 
-set(OP_NAME place_io)
+set(OP_NAME circuit_io)
 
 set(TARGET_NAME ${OP_NAME})
 
@@ -117,8 +117,8 @@ set_target_properties(${TARGET_NAME} PROPERTIES
 
 # Install - using scikit-build-core's Python integration
 install(TARGETS ${TARGET_NAME}
-  LIBRARY DESTINATION place_io)
+  LIBRARY DESTINATION circuit_io)
 
 file(GLOB INSTALL_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/*.py)
 install(FILES ${INSTALL_SRCS}
-  DESTINATION place_io)
+  DESTINATION circuit_io)
