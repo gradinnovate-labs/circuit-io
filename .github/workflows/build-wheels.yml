@@ -38,12 +38,9 @@ jobs:
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
           CIBW_ARCHS: x86_64
           CIBW_BUILD_FRONTEND: build
-          CIBW_BEFORE_BUILD: |
-            pip install cmake ninja pybind11 scikit-build-core
           CIBW_ENVIRONMENT: |
             CMAKE_CXX_ABI=0
             CMAKE_BUILD_TYPE=Release
-            CMAKE_PREFIX_PATH: /opt/python
 
       - name: Upload wheels
         uses: actions/upload-artifact@v4
@@ -69,12 +66,9 @@ jobs:
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
           CIBW_ARCHS: x86_64
           CIBW_BUILD_FRONTEND: build
-          CIBW_BEFORE_BUILD: |
-            pip install cmake ninja pybind11 scikit-build-core
           CIBW_ENVIRONMENT: |
             CMAKE_CXX_ABI=1
             CMAKE_BUILD_TYPE=Release
-            CMAKE_PREFIX_PATH: /opt/python
 
       - name: Upload wheels
         uses: actions/upload-artifact@v4
