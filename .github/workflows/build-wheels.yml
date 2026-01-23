@@ -10,6 +10,15 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      deploy_mode:
+        description: 'Deploy mode: test (TestPyPI) or prod (production)'
+        required: false
+        default: 'test'
+        type: choice
+        options:
+          - test
+          - prod
 
 jobs:
   build_wheels:
@@ -46,11 +55,22 @@ jobs:
           pip install scikit-build-core pybind11 ninja
 
       - name: Build wheel (Python ${{ matrix.python }} ABI${{ matrix.abi }})
-        working-directory: ./
         env:
           CMAKE_CXX_ABI: ${{ matrix.abi }}
+          DEPLOY_MODE: ${{ github.event.inputs.deploy_mode }}
+          PYPI_PUB_TOKEN: ${{ secrets.PYPI_PUB_TOKEN }}
+          PYPI_TEST_TOKEN: ${{ secrets.PYPI_TEST_TOKEN }}
         run: |
-          pip install .
+          if [ "${DEPLOY_MODE}" = "prod" ]; then
+            echo "Deploying to Production PyPI"
+            TWINE_USERNAME="__token__"
+            TWINE_PASSWORD="${PYPI_PUB_TOKEN}"
+          else
+            echo "Deploying to TestPyPI"
+            TWINE_USERNAME="__token__"
+            TWINE_PASSWORD="${PYPI_TEST_TOKEN}"
+          fi
+          python -m pip install .
 
       - name: Check built wheel
         working-directory: ./cpp/place_io
