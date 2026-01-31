@@ -43,15 +43,15 @@ def test_bookshelf():
     return True
 
 def test_lef_def_verilog():
-    """Test 2: mgc_des_perf_1 (LEF + DEF + Verilog)"""
+    """Test 2: mgc_des_perf_a (LEF + DEF + Verilog)"""
     print("\n" + "=" * 70)
-    print("TEST 2: mgc_des_perf_1 (LEF + DEF + Verilog)")
+    print("TEST 2: mgc_des_perf_a (LEF + DEF + Verilog)")
     print("=" * 70)
 
-    lef1 = os.path.join('raw_benchmarks', 'ispd2015', 'mgc_des_perf_1', 'tech.lef')
-    lef2 = os.path.join('raw_benchmarks', 'ispd2015', 'mgc_des_perf_1', 'cells.lef')
-    def_file = os.path.join('raw_benchmarks', 'ispd2015', 'mgc_des_perf_1', 'floorplan.def')
-    verilog = os.path.join('raw_benchmarks', 'ispd2015', 'mgc_des_perf_1', 'design.v')
+    lef1 = os.path.join('raw_benchmarks', 'ispd2015', 'mgc_des_perf_a', 'tech.lef')
+    lef2 = os.path.join('raw_benchmarks', 'ispd2015', 'mgc_des_perf_a', 'cells.lef')
+    def_file = os.path.join('raw_benchmarks', 'ispd2015', 'mgc_des_perf_a', 'floorplan.def')
+    verilog = os.path.join('raw_benchmarks', 'ispd2015', 'mgc_des_perf_a', 'design.v')
 
     abs_lef1 = os.path.abspath(lef1)
     abs_lef2 = os.path.abspath(lef2)
@@ -119,7 +119,7 @@ def main():
     # Test 2: LEF + DEF + Verilog
     try:
         result2 = test_lef_def_verilog()
-        results.append(("mgc_des_perf_1 (LEF + DEF + Verilog)", "PASSED" if result2 else "FAILED"))
+        results.append(("mgc_des_perf_a (LEF + DEF + Verilog)", "PASSED" if result2 else "FAILED"))
     except Exception as e:
         print(f"ERROR in test 2: {e}")
         results.append(("mgc_des_perf_1 (LEF + DEF + Verilog)", f"FAILED: {str(e)[:50]}"))

@@ -226,8 +226,12 @@ PlaceDB read_mixed(pybind11::list lef_files, const std::string& def_file, const 
     flag = DREAMPLACE_NAMESPACE::readDef(db);
     dreamplaceAssertMsg(flag, "failed to read input DEF files");
 
-    flag = DREAMPLACE_NAMESPACE::readVerilog(db);
-    dreamplaceAssertMsg(flag, "failed to read input Verilog file");
+    // if netlist is not set by DEF, read verilog
+    if (db.nets().empty())
+    {
+        flag = DREAMPLACE_NAMESPACE::readVerilog(db);
+        dreamplaceAssertMsg(flag, "failed to read input Verilog file");
+    }
 
     db.adjustParams();
     return db;

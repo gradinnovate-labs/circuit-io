@@ -12,15 +12,24 @@ import os
 import circuit_io
 
 def main():
-    # Path to adaptec1 benchmark
-    aux_file = os.path.join(os.path.dirname(__file__), 'raw_benchmarks', 'ispd2005', 'adaptec1', 'adaptec1.aux')
+    # Path to mgc_des_perf_a benchmark (ispd2015)
+    lef1 = os.path.join(os.path.dirname(__file__), 'raw_benchmarks', 'ispd2015', 'mgc_des_perf_a', 'tech.lef')
+    lef2 = os.path.join(os.path.dirname(__file__), 'raw_benchmarks', 'ispd2015', 'mgc_des_perf_a', 'cells.lef')
+    def_file = os.path.join(os.path.dirname(__file__), 'raw_benchmarks', 'ispd2015', 'mgc_des_perf_a', 'floorplan.def')
+    verilog = os.path.join(os.path.dirname(__file__), 'raw_benchmarks', 'ispd2015', 'mgc_des_perf_a', 'design.v')
 
-    print(f"Reading benchmark: {aux_file}")
+    print(f"Reading benchmark: mgc_des_perf_a (LEF + DEF + Verilog)")
     print("=" * 60)
 
-    # Use forward function to read the Bookshelf files
+    # Use forward function to read LEF/DEF/Verilog files
     # forward expects a list of command-line arguments
-    args = ['DREAMPlace', '--bookshelf_aux_input', aux_file]
+    args = [
+        'DREAMPlace',
+        '--lef_input', lef1,
+        '--lef_input', lef2,
+        '--def_input', def_file,
+        '--verilog_input', verilog
+    ]
     db = circuit_io.forward(args)
 
     # Output 1: Basic circuit properties
